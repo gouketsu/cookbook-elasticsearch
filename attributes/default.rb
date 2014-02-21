@@ -15,7 +15,7 @@ node.normal[:elasticsearch]    = DeepMerge.merge(node.normal[:elasticsearch].to_
 #
 default.elasticsearch[:method]        = "pkg" #Method could be source or pkg
   
-default.elasticsearch[:version]       = "0.90.5"
+default.elasticsearch[:version]       = "1.0.0"
 default.elasticsearch[:host]          = "http://download.elasticsearch.org"
 default.elasticsearch[:repository]    = "elasticsearch/elasticsearch"
 default.elasticsearch[:filename]      = "elasticsearch-#{node.elasticsearch[:version]}.tar.gz"
@@ -40,7 +40,7 @@ default.elasticsearch[:user]      = "elasticsearch"
 default.elasticsearch[:path][:data] = "/usr/local/var/data/elasticsearch"
 default.elasticsearch[:path][:logs] = "/usr/local/var/log/elasticsearch"
 
-default.elasticsearch[:pid_path]  = "/usr/local/var/run/elasticsearch"
+default.elasticsearch[:pid_path]  = "/usr/local/var/run"
 default.elasticsearch[:pid_file]  = "#{node.elasticsearch[:pid_path]}/#{node.elasticsearch[:node][:name].to_s.gsub(/\W/, '_')}.pid"
 
 # === MEMORY

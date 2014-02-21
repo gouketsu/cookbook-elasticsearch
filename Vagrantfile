@@ -29,7 +29,7 @@ class Hash
   end unless respond_to?(:deep_merge!)
 end
 
-puts "[Vagrant   ] #{Vagrant::VERSION}"
+STDERR.puts "[Vagrant   ] #{Vagrant::VERSION}"
 
 # Automatically install and mount cookbooks from Berksfile on old Vagrant
 #
@@ -68,41 +68,13 @@ distributions = {
     }
   },
 
-  :precise32 => {
-    :url      => 'http://files.vagrantup.com/precise32.box',
-    :run_list => %w| apt vim java monit elasticsearch elasticsearch::proxy elasticsearch::monit elasticsearch::jmx |,
-    :ip       => '33.33.33.10',
-    :primary  => false,
-    :node     => {}
-  },
-
-  :lucid64 => {
-    :url      => 'http://files.vagrantup.com/lucid64.box',
-    :run_list => %w| apt vim java monit elasticsearch elasticsearch::proxy elasticsearch::monit elasticsearch::jmx |,
-    :ip       => '33.33.33.10',
-    :primary  => false,
-    :node     => {}
-  },
-
-  :lucid32 => {
-    :url      => 'http://files.vagrantup.com/lucid32.box',
-    :run_list => %w| apt vim java monit elasticsearch elasticsearch::proxy elasticsearch::monit elasticsearch::jmx |,
-    :ip       => '33.33.33.11',
-    :primary  => false,
-    :node     => {}
-  },
-
   :centos6 => {
     # Note: Monit cookbook broken on CentOS
     :url      => 'https://opscode-vm.s3.amazonaws.com/vagrant/boxes/opscode-centos-6.3.box',
     :run_list => %w| yum::epel build-essential vim java elasticsearch elasticsearch::proxy elasticsearch::data |,
-    :ip       => '33.33.33.12',
+    :ip       => '33.33.33.11',
     :primary  => false,
     :node     => {
-      :java => {
-        :install_flavor => "openjdk",
-        :jdk_version => "7"
-      },
       :elasticsearch => {
         :path => {
           :data => "/usr/local/var/data/elasticsearch/disk1"
@@ -128,6 +100,11 @@ distributions = {
 }
 
 node_config = {
+  :java => {
+    :install_flavor => "openjdk",
+    :jdk_version    => "7"
+  },
+
   :elasticsearch => {
     :cluster => { :name => "elasticsearch_vagrant" },
 
@@ -236,21 +213,31 @@ Vagrant::Config.run do |config|
       #
       config.vm.provision :shell do |shell|
         shell.inline = %Q{
-          which apt-get > /dev/null 2>&1 && apt-get update --quiet --yes && apt-get install curl --quiet --yes
-          which yum > /dev/null 2>&1 && yum update -y && yum install curl -y
+          which apt-get > /dev/null 2>&1 && apt-get update --quiet --yes || true;
+          which yum > /dev/null 2>&1 && yum update -y || true;
         }
       end if ENV['UPDATE']
 
       # Install latest Chef on the machine
       #
       config.vm.provision :shell do |shell|
-        version = ENV['CHEF'].match(/^\d+/) ? ENV['CHEF'] : nil
-        shell.inline = %Q{
-          which apt-get > /dev/null 2>&1 && apt-get install curl --quiet --yes
-          which yum > /dev/null 2>&1 && yum install curl -y
-          test -d "/opt/chef" || curl -# -L http://www.opscode.com/chef/install.sh | sudo bash -s -- #{version ? "-v #{version}" : ''}
-          /opt/chef/embedded/bin/gem list pry | grep pry || /opt/chef/embedded/bin/gem install pry --no-ri --no-rdoc
-        }
+        version   = ENV['CHEF'].match(/^\d+/) ? ENV['CHEF'] : nil
+
+        if version
+          shell.inline = %Q{
+            which apt-get > /dev/null 2>&1 && apt-get install curl --quiet --yes || true;
+            which yum > /dev/null 2>&1 && yum install curl -y || true;
+            test -d "/opt/chef" && grep 'chef #{version}' /opt/chef/version-manifest.txt || curl -# -L http://www.opscode.com/chef/install.sh | sudo bash -s -- #{version ? "-v #{version}" : ''};
+            /opt/chef/embedded/bin/gem list pry | grep pry || /opt/chef/embedded/bin/gem install pry --no-ri --no-rdoc || true;
+          }
+        else
+          shell.inline = %Q{
+            which apt-get > /dev/null 2>&1 && apt-get install curl --quiet --yes || true;
+            which yum > /dev/null 2>&1 && yum install curl -y || true;
+            test -d "/opt/chef" && chef-solo -v | grep 11 || curl -# -L http://www.opscode.com/chef/install.sh | sudo bash -s --;
+            /opt/chef/embedded/bin/gem list pry | grep pry || /opt/chef/embedded/bin/gem install pry --no-ri --no-rdoc;
+          }
+        end
       end if ENV['CHEF']
 
       # Provision the machine with Chef Solo

@@ -6,13 +6,13 @@ search engine on a Linux compatible operating system.
 
 It requires a working _Java_ installation on the target node; add your preferred `java` cookbook to the node `run_list`.
 
-The cookbook downloads the _elasticsearch_ tarball (via the [`ark`](http://github.com/bryanwb/chef-ark) provider),
+The cookbook downloads the _Elasticsearch_ tarball (via the [`ark`](http://github.com/bryanwb/chef-ark) provider),
 unpacks and moves it to the directory you have specified in the node configuration (`/usr/local/elasticsearch` by default).
 
-It installs a service which enables you to start, stop, restart and check status of the _elasticsearch_ process.
+It installs a service which enables you to start, stop, restart and check status of the _Elasticsearch_ process.
 
 If you include the `elasticsearch::monit` recipe, it will create a configuration file for _Monit_,
-which will check whether _elasticsearch_ is running, reachable by HTTP and the cluster is in the "green" state.
+which will check whether _Elasticsearch_ is running, reachable by HTTP and the cluster is in the "green" state.
 (Assumed you have included a compatible ["monit" cookbook](http://community.opscode.com/cookbooks/monit)
 in your run list first.)
 
@@ -59,8 +59,7 @@ echo '{
   },
 
   "elasticsearch": {
-    "cluster" : { "name" : "elasticsearch_test_chef" },
-    "bootstrap.mlockall" : false
+    "cluster" : { "name" : "elasticsearch_test_chef" }
   }
 }
 ' > node.json
@@ -69,45 +68,49 @@ echo '{
 Let's upload it to our server (assuming Ubuntu on Amazon EC2):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-scp -o User=ubuntu \
-    -o IdentityFile=/path/to/your/key.pem \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    node.json ec2-12-45-67-89.compute-1.amazonaws.com:
+export HOST=ec2-12-45-67-89.compute-1.amazonaws.com
+export SSH_OPTIONS="-o User=ubuntu -o IdentityFile=/path/to/your/key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+scp $SSH_OPTIONS node.json $HOST:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's download the cookbook on the target system:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-ssh -i /path/to/your/key.pem ec2-12-45-67-89.compute-1.amazonaws.com \
-  "curl -# -L -k -o cookbook-elasticsearch-master.tar.gz https://github.com/elasticsearch/cookbook-elasticsearch/archive/master.tar.gz"
+ssh -t $SSH_OPTIONS $HOST \
+  "curl -# -L -k -o /tmp/cookbook-elasticsearch-master.tar.gz https://github.com/elasticsearch/cookbook-elasticsearch/archive/master.tar.gz"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, let's install latest Chef, install dependent cookbooks, and run `chef-solo`:
+Let's bootstrap the server now -- install latest Chef, couple of software packages and Ruby gems,
+and install dependent cookbooks via [_Berkshelf_](http://berkshelf.com):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-
-ssh -t -i /path/to/your/key.pem ec2-12-45-67-89.compute-1.amazonaws.com <<END
+time ssh -t $SSH_OPTIONS $HOST <<END
   sudo apt-get update
   sudo apt-get install build-essential curl git vim -y
   curl -# -L http://www.opscode.com/chef/install.sh | sudo bash -s --
   sudo mkdir -p /etc/chef/; sudo mkdir -p /var/chef/cookbooks/elasticsearch
-  sudo tar --strip 1 -C /var/chef/cookbooks/elasticsearch -xf cookbook-elasticsearch-master.tar.gz
+  sudo tar --strip 1 -C /var/chef/cookbooks/elasticsearch -xf /tmp/cookbook-elasticsearch-master.tar.gz
   sudo apt-get install bison zlib1g-dev libopenssl-ruby1.9.1 libssl-dev libyaml-0-2 libxslt-dev libxml2-dev libreadline-gplv2-dev libncurses5-dev file ruby1.9.1-dev git --yes --fix-missing
-  sudo /opt/chef/embedded/bin/gem install berkshelf --version 1.4.5 --no-rdoc --no-ri
+  sudo /opt/chef/embedded/bin/gem install berkshelf --version 2.0.14 --no-rdoc --no-ri
   sudo /opt/chef/embedded/bin/berks install --path=/var/chef/cookbooks/ --berksfile=/var/chef/cookbooks/elasticsearch/Berksfile
-  sudo chef-solo -N elasticsearch-test-chef-solo -j node.json
 END
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, let's run `chef-solo` to provision the node!
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
+ssh -t $SSH_OPTIONS $HOST "sudo chef-solo -N elasticsearch-test-chef-solo -j node.json"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Verify the installation with:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-ssh -i /path/to/your/key.pem ec2-12-45-67-89.compute-1.amazonaws.com "curl localhost:9200"
+ssh $SSH_OPTIONS $HOST "curl localhost:9200"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For a full and thorough walktrough, please read the tutorial on
-[deploying elasticsearch with _Chef Solo_](http://www.elasticsearch.org/tutorials/deploying-elasticsearch-with-chef-solo/)
+[deploying Elasticsearch with _Chef Solo_](http://www.elasticsearch.org/tutorials/deploying-elasticsearch-with-chef-solo/)
 which uses this cookbook as an example.
 
 This cookbook comes with a Rake task which allows to create, bootstrap and configure an Amazon EC2 with a single command. Save your node configuration into `tmp/node.json` file and run:
@@ -269,7 +272,7 @@ management tool such as [_BigDesk_](http://github.com/lukas-vlcek/bigdesk) or
 (Don't forget to set the `node.elasticsearch[:nginx][:allow_cluster_api]` attribute to _true_
 if you want to access these tools via the proxy.)
 
-To enable authorized access to _elasticsearch_, you need to include the `elasticsearch::proxy` recipe,
+To enable authorized access to _Elasticsearch_, you need to include the `elasticsearch::proxy` recipe,
 which will install, configure and run [_Nginx_](http://nginx.org) as a reverse proxy, allowing users with proper
 credentials to connect.
 
@@ -433,7 +436,7 @@ You may want to test-drive this cookbook on a different distribution; check out 
 Launch the virtual machine (it will download the box unless you already have it):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-    time CHEF=latest bundle exec vagrant up precise64
+    time UPDATE=yes CHEF=latest bundle exec vagrant up precise64
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The machine will be started and automatically provisioned with
@@ -445,13 +448,13 @@ You'll see _Chef_ debug messages flying by in your terminal, downloading, instal
 _Nginx_, _Elasticsearch_, and all the other components.
 The process should take less then 10 minutes on a reasonable machine and internet connection.
 
-After the process is done, you may connect to _elasticsearch_ via the _Nginx_ proxy from the outside:
+After the process is done, try connecting to _Elasticsearch_ via the _Nginx_ proxy from the outside:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
-    curl 'http://USERNAME:PASSWORD@33.33.33.10:8080/test_chef_cookbook/_search?pretty&q=*'
+    curl -i 'http://USERNAME:PASSWORD@33.33.33.10:8080'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Of course, you should connect to the box with SSH and check things out:
+Of course, you can connect to the box with SSH and check things out:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bash
     bundle exec vagrant ssh precise64
