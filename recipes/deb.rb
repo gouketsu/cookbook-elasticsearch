@@ -27,7 +27,8 @@ if node.elasticsearch[:deb_type] == "source"
 else
   package "elasticsearch" do
     action :install
-     options("--force-yes")
+    version node[:elasticsearch][:version]
+    options("--force-yes")
     notifies  :run, "execute[stop_es_after_install]", :immediately
   end
 end
