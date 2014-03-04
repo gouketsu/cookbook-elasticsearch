@@ -15,7 +15,7 @@ node.normal[:elasticsearch]    = DeepMerge.merge(node.normal[:elasticsearch].to_
 #
 default.elasticsearch[:method]        = "pkg" #Method could be source or pkg
   
-default.elasticsearch[:version]       = "1.0.0"
+default.elasticsearch[:version]       = "1.0.1"
 default.elasticsearch[:host]          = "http://download.elasticsearch.org"
 default.elasticsearch[:repository]    = "elasticsearch/elasticsearch"
 default.elasticsearch[:filename]      = "elasticsearch-#{node.elasticsearch[:version]}.tar.gz"
