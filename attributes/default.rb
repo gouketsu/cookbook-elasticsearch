@@ -40,7 +40,7 @@ default.elasticsearch[:user]      = "elasticsearch"
 default.elasticsearch[:path][:data] = "/usr/local/var/data/elasticsearch"
 default.elasticsearch[:path][:logs] = "/usr/local/var/log/elasticsearch"
 
-default.elasticsearch[:pid_path]  = "/usr/local/var/run"
+default.elasticsearch[:pid_path]  = "/usr/local/var/run/elasticsearch"
 default.elasticsearch[:pid_file]  = "#{node.elasticsearch[:pid_path]}/#{node.elasticsearch[:node][:name].to_s.gsub(/\W/, '_')}.pid"
 
 # === MEMORY

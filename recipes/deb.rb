@@ -28,8 +28,8 @@ else
   package "elasticsearch" do
     action :install
     version node[:elasticsearch][:version]
-     options("--force-yes")
-    notifies  :run, "execute[stop_es_after_install]", :immediately unless node[:elasticsearch][:skip_restart]
+    options("--force-yes")
+    notifies  :run, "execute[stop_es_after_install]", :immediately unless node[:elasticsearch][:skip_restart] || node[:elasticsearch][:version] > '1'
   end
 end
 
