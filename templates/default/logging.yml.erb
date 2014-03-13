@@ -75,5 +75,5 @@ appender:
     facility: <%= node.elasticsearch[:syslog][:facility] %>
     layout:
       type: pattern
-      conversionPattern: "[%d{ISO8601}][%-5p][%-25c] %m%n"
+      conversionPattern: "<%= node.elasticsearch[:syslog][:pattern] %>"
    
