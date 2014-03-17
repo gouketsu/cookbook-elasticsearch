@@ -5,6 +5,7 @@ default.elasticsearch[:logging]['index.indexing.slowlog'] = 'TRACE, index_indexi
 default.elasticsearch[:rootlogger]= 'WARN, console, file'
 default.elasticsearch[:syslog][:server] = 'localhost'  
 default.elasticsearch[:syslog][:facility] = 'local0'
+default.elasticsearch[:syslog][:pattern]= 'elasticsearch: [%-5p][%-25c] %m%n'
 
   
   # --------------------------------------------
