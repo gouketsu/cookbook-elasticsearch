@@ -22,11 +22,20 @@ node.set['elasticsearch']['discovery']['zen']['ping']['multicast']['enabled'] = 
 nodes = search_for_nodes(node['elasticsearch']['discovery']['search_query'],
                          node['elasticsearch']['discovery']['node_attribute'])
 
-p node['elasticsearch']['discovery']['node_attribute']
+
 Chef::Log.debug("Found elasticsearch nodes at #{nodes.join(', ').inspect}")
 
 #add local ip address in case of it is not found. First time start
-nodes << "#{node.ipaddress}" unless nodes.include?("#{node.ipaddress}")
+if node['elasticsearch']['discovery']['node_attribute'].nil?
+   nodes << "#{node.ipaddress}" unless nodes.include?("#{node.ipaddress}")
+else
+   keys = node['elasticsearch']['discovery']['node_attribute'].split('.')
+   value = node
+   keys.each do |key|
+      value = value[key]
+   end
+   nodes << "#{value}" unless nodes.include?("#{value}")
+end
 
 node.set['elasticsearch']['discovery']['zen']['ping']['unicast']['hosts'] = nodes.join(',')
 
