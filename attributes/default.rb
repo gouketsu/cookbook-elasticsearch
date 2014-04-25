@@ -7,17 +7,18 @@ Chef::Log.debug "Loaded settings: #{settings.inspect}"
 #
 node.default[:elasticsearch] ||= {}
 node.normal[:elasticsearch]  ||= {}
+
 node.normal[:elasticsearch]    = DeepMerge.merge(node.default[:elasticsearch].to_hash, node.normal[:elasticsearch].to_hash)
 node.normal[:elasticsearch]    = DeepMerge.merge(node.normal[:elasticsearch].to_hash, settings.to_hash)
 
 
 # === VERSION AND LOCATION
 #
-default.elasticsearch[:method]        = "pkg" #Method could be source or pkg
-  
-default.elasticsearch[:version]       = "1.0.1"
-default.elasticsearch[:host]          = "http://download.elasticsearch.org"
-default.elasticsearch[:repository]    = "elasticsearch/elasticsearch"
+default.elasticsearch[:method]        = 'pkg' # Method could be source or pkg
+
+default.elasticsearch[:version]       = '1.0.1'
+default.elasticsearch[:host]          = 'http://download.elasticsearch.org'
+default.elasticsearch[:repository]    = 'elasticsearch/elasticsearch'
 default.elasticsearch[:filename]      = "elasticsearch-#{node.elasticsearch[:version]}.tar.gz"
 default.elasticsearch[:download_url]  = [node.elasticsearch[:host], node.elasticsearch[:repository], node.elasticsearch[:filename]].join('/')
 
@@ -25,6 +26,14 @@ default.elasticsearch[:download_url]  = [node.elasticsearch[:host], node.elastic
 #
 default.elasticsearch[:cluster][:name] = 'elasticsearch'
 default.elasticsearch[:node][:name]    = node.name
+default.elasticsearch[:node][:tag]     = node.name.split('.')[0]
+
+
+# === Security
+#
+default.elasticsearch[:script][:disable_dynamic] = true
+
+
 
 # === USER & PATHS
 #

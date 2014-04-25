@@ -1,4 +1,4 @@
-default.elasticsearch[:deb_url] = "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.5.deb"
-default.elasticsearch[:deb_sha] = "d25cdc971b1ef2393a620731137bae16e0d1107d49294b11c14634da0f1bb330"
-default.elasticsearch[:deb_type] = "source"
+default.elasticsearch[:deb_url] = 'https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb'
+default.elasticsearch[:deb_sha] = '6fecaead5ca0967a20f16beacf0252c186a70b1c'
+default.elasticsearch[:deb_type] = 'source'
 
