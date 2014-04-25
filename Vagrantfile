@@ -252,7 +252,6 @@ Vagrant.configure(2) do |config|
         chef.run_list = options[:run_list]
         chef.run_list << 'elasticsearch::test' if ENV['TEST']
         chef.json     = node_config.dup.toto!(options[:node]).toto!(custom_config)
-        p chef.json[:elasticsearch][:jmx_config]
       end
     end
 
