@@ -25,7 +25,14 @@
 <%= print_value 'node.master' -%>
 <%= print_value 'node.data' -%>
 <%= print_value 'node.river' -%>
-<%= print_value 'node.tag' -%>
+<%- tag = "" %>
+<%- if node[:elasticsearch][:node].key?('tag') %>
+  <%- node[:elasticsearch][:node][:tag].each do |index| %>
+    <%- tag << "." if tag.length != 0 %>
+    <%- tag << node[:elasticsearch][:node][:name].split('.')[index] %>
+  <%- end %>
+<%- end %>
+node.tag: <%= tag %>
 <%= print_value 'node.max_local_storage_nodes' -%>
 
 #################################### Security #####################################

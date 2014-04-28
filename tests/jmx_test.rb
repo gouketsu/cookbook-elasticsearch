@@ -7,7 +7,7 @@ describe_recipe 'elasticsearch::jmx' do
   describe "Installation" do
 
 
-    it 'update configuration file' do
+    it 'update configuration file with' do
       
     
       file("#{node.elasticsearch[:path][:conf]}/elasticsearch-env.sh").

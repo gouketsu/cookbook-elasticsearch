@@ -218,7 +218,7 @@ Vagrant.configure(2) do |config|
           which apt-get > /dev/null 2>&1 && apt-get install curl --quiet --yes || true;
           which yum > /dev/null 2>&1 && yum install curl -y || true;
         }
-      end if ENV['UPDATE']
+      end 
 
       # Install latest Chef on the machine
       #

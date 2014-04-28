@@ -26,7 +26,9 @@ default.elasticsearch[:download_url]  = [node.elasticsearch[:host], node.elastic
 #
 default.elasticsearch[:cluster][:name] = 'elasticsearch'
 default.elasticsearch[:node][:name]    = node.name
-default.elasticsearch[:node][:tag]     = node.name.split('.')[0]
+
+# Node tag split node name and format tag based on array
+default.elasticsearch[:node][:tag]     = [0]
 
 
 # === Security
