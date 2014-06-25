@@ -4,34 +4,37 @@ Erubis::Context.send(:include, Extensions::Templates)
 
 elasticsearch = "elasticsearch-#{node.elasticsearch[:version]}"
 
-include_recipe "elasticsearch::curl"
-include_recipe "ark"
 
-# Create user and group
-#
-group node.elasticsearch[:user] do
-  gid node.elasticsearch[:gid]
-  action :create
-  system true
-end
+unless node[:elasticsearch][:skip_installation]
+  include_recipe "elasticsearch::curl"
+  include_recipe "ark"
 
-user node.elasticsearch[:user] do
-  comment "ElasticSearch User"
-  home    "#{node.elasticsearch[:dir]}/elasticsearch"
-  shell   "/bin/bash"
-  uid     node.elasticsearch[:uid]
-  gid     node.elasticsearch[:user]
-  supports :manage_home => false
-  action  :create
-  system true
-end
+  # Create user and group
+  #
+  group node.elasticsearch[:user] do
+    gid node.elasticsearch[:gid]
+    action :create
+    system true
+  end
 
-# FIX: Work around the fact that Chef creates the directory even for `manage_home: false`
-bash "remove the elasticsearch user home" do
-  user    'root'
-  code    "rm -rf  #{node.elasticsearch[:dir]}/elasticsearch"
-  not_if  { ::File.symlink?("#{node.elasticsearch[:dir]}/elasticsearch") }
-  only_if { ::File.directory?("#{node.elasticsearch[:dir]}/elasticsearch") }
+  user node.elasticsearch[:user] do
+    comment "ElasticSearch User"
+    home    "#{node.elasticsearch[:dir]}/elasticsearch"
+    shell   "/bin/bash"
+    uid     node.elasticsearch[:uid]
+    gid     node.elasticsearch[:user]
+    supports :manage_home => false
+    action  :create
+    system true
+  end
+
+  # FIX: Work around the fact that Chef creates the directory even for `manage_home: false`
+  bash "remove the elasticsearch user home" do
+    user    'root'
+    code    "rm -rf  #{node.elasticsearch[:dir]}/elasticsearch"
+    not_if  { ::File.symlink?("#{node.elasticsearch[:dir]}/elasticsearch") }
+    only_if { ::File.directory?("#{node.elasticsearch[:dir]}/elasticsearch") }
+  end
 end
 
 
@@ -69,35 +72,42 @@ template "/etc/init.d/elasticsearch" do
   owner 'root' and mode 0755
 end
 
-service "elasticsearch" do
-  supports :status => true, :restart => true
-  action [ :enable ]
-end
+if node[:elasticsearch][:skip_installation]
+  service "elasticsearch" do
+    supports :status => true, :restart => true
+    action [ :nothing ]
+  end
+else
+  service "elasticsearch" do
+    supports :status => true, :restart => true
+    action [ :enable ]
+  end
 
-# Download, extract, symlink the elasticsearch libraries and binaries
-#
-ark_prefix_root = node.elasticsearch[:dir] || node.ark[:prefix_root]
-ark_prefix_home = node.elasticsearch[:dir] || node.ark[:prefix_home]
+  # Download, extract, symlink the elasticsearch libraries and binaries
+  #
+  ark_prefix_root = node.elasticsearch[:dir] || node.ark[:prefix_root]
+  ark_prefix_home = node.elasticsearch[:dir] || node.ark[:prefix_home]
 
-ark "elasticsearch" do
-  url   node.elasticsearch[:download_url]
-  owner node.elasticsearch[:user]
-  group node.elasticsearch[:user]
-  version node.elasticsearch[:version]
-  has_binaries ['bin/elasticsearch', 'bin/plugin']
-  checksum node.elasticsearch[:checksum]
-  prefix_root   ark_prefix_root
-  prefix_home   ark_prefix_home
+  ark "elasticsearch" do
+    url   node.elasticsearch[:download_url]
+    owner node.elasticsearch[:user]
+    group node.elasticsearch[:user]
+    version node.elasticsearch[:version]
+    has_binaries ['bin/elasticsearch', 'bin/plugin']
+    checksum node.elasticsearch[:checksum]
+    prefix_root   ark_prefix_root
+    prefix_home   ark_prefix_home
 
-  notifies :start,   'service[elasticsearch]' unless node.elasticsearch[:skip_start]
-  notifies :restart, 'service[elasticsearch]' unless node.elasticsearch[:skip_restart]
+    notifies :start,   'service[elasticsearch]' unless node.elasticsearch[:skip_start]
+    notifies :restart, 'service[elasticsearch]' unless node.elasticsearch[:skip_restart]
 
-  not_if do
-    link   = "#{node.elasticsearch[:dir]}/elasticsearch"
-    target = "#{node.elasticsearch[:dir]}/elasticsearch-#{node.elasticsearch[:version]}"
-    binary = "#{target}/bin/elasticsearch"
+    not_if do
+      link   = "#{node.elasticsearch[:dir]}/elasticsearch"
+      target = "#{node.elasticsearch[:dir]}/elasticsearch-#{node.elasticsearch[:version]}"
+      binary = "#{target}/bin/elasticsearch"
 
-    ::File.directory?(link) && ::File.symlink?(link) && ::File.readlink(link) == target && ::File.exists?(binary)
+      ::File.directory?(link) && ::File.symlink?(link) && ::File.readlink(link) == target && ::File.exists?(binary)
+    end
   end
 end
 
