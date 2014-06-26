@@ -81,7 +81,7 @@ template "/etc/init.d/elasticsearch" do
   owner 'root' and mode 0755
 end
 
-if node[:elasticsearch][:installation][:mode] == 'tar'
+if node[:elasticsearch][:installation][:mode] != 'tar'
   service "elasticsearch" do
     supports :status => true, :restart => true
     action [ :nothing ]
