@@ -4,8 +4,17 @@ Erubis::Context.send(:include, Extensions::Templates)
 
 elasticsearch = "elasticsearch-#{node.elasticsearch[:version]}"
 
+if node[:elasticsearch][:installation][:mode] == 'pkg'
+  case node['platform']
+    when "ubuntu","debian"
+      include_recipe "elasticsearch::deb"
+    when "redhat","fedora"
+      include_recipe "elasticsearch::rpm" 
+  end
+end
 
-unless node[:elasticsearch][:skip_installation]
+
+if node[:elasticsearch][:installation][:mode] == 'tar'
   include_recipe "elasticsearch::curl"
   include_recipe "ark"
 
@@ -72,7 +81,7 @@ template "/etc/init.d/elasticsearch" do
   owner 'root' and mode 0755
 end
 
-if node[:elasticsearch][:skip_installation]
+if node[:elasticsearch][:installation][:mode] == 'tar'
   service "elasticsearch" do
     supports :status => true, :restart => true
     action [ :nothing ]
