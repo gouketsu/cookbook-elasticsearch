@@ -43,7 +43,7 @@ module Extensions
         raise "[!] Failed to install plugin" unless system command
 
         # Ensure proper permissions
-        raise "[!] Failed to set permission" unless system "chown -R #{node.elasticsearch[:user]}:#{node.elasticsearch[:user]} #{node.elasticsearch[:dir]}/elasticsearch-#{node.elasticsearch[:version]}/plugins/"
+	raise "[!] Failed to set permission" unless system "chown -R #{node.elasticsearch[:user]}:#{node.elasticsearch[:user]} #{node.elasticsearch[:dir]}/elasticsearch/plugins/"
       end
 
       notifies :restart, 'service[elasticsearch]' unless node.elasticsearch[:skip_restart]

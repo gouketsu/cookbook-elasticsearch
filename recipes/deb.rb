@@ -20,3 +20,9 @@ ruby_block "Set heap size in /etc/default/elasticsearch" do
     fe.write_file
   end
 end
+#override installation path
+node.override[:elasticsearch][:dir]         = '/usr/share/'
+node.override[:elasticsearch][:bindir]      = '/usr/share/elasticsearch/bin'
+node.override[:elasticsearch][:path][:conf] = '/etc/elasticsearch'
+node.override[:elasticsearch][:nginx][:passwords_file] = \
+		  "#{node[:elasticsearch][:path][:conf]}/passwords"

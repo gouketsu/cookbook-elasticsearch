@@ -11,3 +11,12 @@ end
 rpm_package "#{Chef::Config[:file_cache_path]}/#{filename}" do
   action :install
 end
+
+
+
+#override installation path
+node.override[:elasticsearch][:dir]         = '/usr/share/'
+node.override[:elasticsearch][:bindir]      = '/usr/share/elasticsearch/bin'
+node.override[:elasticsearch][:path][:conf] = '/etc/elasticsearch'
+node.override[:elasticsearch][:nginx][:passwords_file] = \
+		  "#{node[:elasticsearch][:path][:conf]}/passwords"
