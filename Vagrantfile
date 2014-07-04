@@ -43,6 +43,8 @@ distributions = {
     :primary  => true,
     :node     => {
       :elasticsearch => {
+        :deb_url => "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.12.deb",
+        :deb_sha => "13783b95b35e347a3471f22234c544ae50655b78",
         :path => {
           :data => %w| /usr/local/var/data/elasticsearch/disk1 /usr/local/var/data/elasticsearch/disk2 |
         },
@@ -76,6 +78,8 @@ distributions = {
     :primary  => false,
     :node     => {
       :elasticsearch => {
+        :rpm_url => "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.12.noarch.rpm",
+        :rpm_sha => "13783b95b35e347a3471f22234c544ae50655b78",
         :path => {
           :data => "/usr/local/var/data/elasticsearch/disk1"
         },
@@ -248,6 +252,8 @@ Vagrant::Config.run do |config|
         chef.run_list = options[:run_list]
         chef.run_list << 'elasticsearch::test' if ENV['TEST']
         chef.json     = node_config.dup.deep_merge!(options[:node]).deep_merge!(custom_config)
+        chef.json[:elasticsearch][:installation] = {} if ENV['PKG']
+        chef.json[:elasticsearch][:installation][:mode] = 'pkg' if ENV['PKG']
       end
     end
 

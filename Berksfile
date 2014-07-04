@@ -9,4 +9,5 @@ cookbook 'java', git: 'git://github.com/opscode-cookbooks/java.git'
 cookbook 'monit', git: 'git://github.com/apsoto/monit.git'
 
 cookbook 'vim'
-cookbook 'minitest-handler', git: 'git://github.com/btm/minitest-handler-cookbook.git'
+cookbook 'minitest-handler', git: 'git://github.com/btm/minitest-handler-cookbook.git', ref: 'v1.1.4'
+cookbook 'build-essential', '~> 1.4.4'

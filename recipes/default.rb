@@ -8,7 +8,7 @@ if node[:elasticsearch][:installation][:mode] == 'pkg'
   case node['platform']
     when "ubuntu","debian"
       include_recipe "elasticsearch::deb"
-    when "redhat","fedora"
+    when "redhat","fedora", "centos"
       include_recipe "elasticsearch::rpm" 
   end
 end
@@ -76,17 +76,25 @@ end
 
 # Create service
 #
-template "/etc/init.d/elasticsearch" do
-  source "elasticsearch.init.erb"
-  owner 'root' and mode 0755
-end
 
 if node[:elasticsearch][:installation][:mode] != 'tar'
+  case node['platform']
+    when "ubuntu","debian"
+      include_recipe "elasticsearch::deb"
+      template "/etc/init.d/elasticsearch" do
+        source "elasticsearch.init.erb"
+        owner 'root' and mode 0755
+      end
+  end
   service "elasticsearch" do
     supports :status => true, :restart => true
     action [ :nothing ]
   end
 else
+  template "/etc/init.d/elasticsearch" do
+    source "elasticsearch.init.erb"
+    owner 'root' and mode 0755
+  end
   service "elasticsearch" do
     supports :status => true, :restart => true
     action [ :enable ]
