@@ -4,6 +4,8 @@ Erubis::Context.send(:include, Extensions::Templates)
 
 elasticsearch = "elasticsearch-#{node.elasticsearch[:version]}"
 
+Chef::Log.debug "Installation mode #{node[:elasticsearch][:installation][:mode]}"
+
 if node[:elasticsearch][:installation][:mode] == 'pkg'
   case node['platform']
     when "ubuntu","debian"
