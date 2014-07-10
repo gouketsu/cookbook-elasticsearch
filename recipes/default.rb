@@ -82,7 +82,6 @@ end
 if node[:elasticsearch][:installation][:mode] != 'tar'
   case node['platform']
     when "ubuntu","debian"
-      include_recipe "elasticsearch::deb"
       template "/etc/init.d/elasticsearch" do
 	source "elasticsearch.init.erb"
 	owner 'root' and mode 0755
