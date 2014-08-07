@@ -75,7 +75,7 @@ stop() {
       if [ ! $CHECK_PID_RUNNING ]; then
         echo -e "\033[1mPID file found, but no matching process running?\033[0m"
         echo    "Removing PID file..."
-        su <%= node[:elasticsearch][:user] %> -m -c "rm $PIDFILE"
+        rm -f $PIDFILE
         exit 0
       fi
 
@@ -89,18 +89,11 @@ stop() {
       while [ $(ps -p $pid | wc -l ) -gt '1' ]; do
         echo -n '.'
         (( timeout ++))
-        if [ $timeout -gt '30' ]; then return; fi
+        if [ $timeout -gt '30' ]; then return 1; fi
         sleep 1
       done
 
-      # Check for pidfile
-      timeout=0
-      while [ -f $PIDFILE  ]; do
-        echo -n '.'
-        (( timeout++ ))
-        if [ $timeout -gt '15' ]; then return; fi
-        sleep 1
-      done
+      rm -f $PIDFILE
 
       echo;
 
@@ -116,7 +109,7 @@ restart() {
     while ps aux | grep 'java' | grep -e "es.pidfile"; do
       echo -n '.'
       (( timeout-- ))
-      if [ $timeout -lt '1' ]; then return; fi
+      if [ $timeout -lt '1' ]; then return 1; fi
       sleep 1
     done;
     start
