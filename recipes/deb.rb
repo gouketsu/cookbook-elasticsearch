@@ -10,6 +10,7 @@ end
 
 dpkg_package "#{Chef::Config[:file_cache_path]}/#{filename}" do
   action :install
+  options "--force-yes"
 end
 
 ruby_block "Set heap size in /etc/default/elasticsearch" do
