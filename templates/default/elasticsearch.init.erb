@@ -96,10 +96,10 @@ stop() {
       # Check for process
       timeout=0
       while [ $(ps -p $pid | wc -l ) -gt '1' ]; do
-        echo -n '.'
-        (( timeout ++))
-	if [ $timeout -gt '30' ]; then return 1; fi
-        sleep 1
+	echo -n '.'
+	(( timeout ++))
+	if [ $timeout -gt '60' ]; then return 1; fi
+	sleep 1
       done
 
       rm -f $PIDFILE
