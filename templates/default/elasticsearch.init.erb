@@ -89,7 +89,7 @@ stop() {
       while [ $(ps -p $pid | wc -l ) -gt '1' ]; do
         echo -n '.'
         (( timeout ++))
-        if [ $timeout -gt '30' ]; then return 1; fi
+        if [ $timeout -gt '60' ]; then return 1; fi
         sleep 1
       done
 
