@@ -89,7 +89,7 @@ if node[:elasticsearch][:installation][:mode] != 'tar'
   end
   service "elasticsearch" do
     supports :status => true, :restart => true
-    action [ :nothing ]
+    action [ :enable ]
   end
 else
   template "/etc/init.d/elasticsearch" do
