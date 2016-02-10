@@ -22,6 +22,7 @@ default.elasticsearch[:repository]    = "elasticsearch/elasticsearch"
 default.elasticsearch[:filename]      = nil
 default.elasticsearch[:download_url]  = nil
 default.elasticsearch[:installation][:mode] = 'tar' # tar or pkg
+default.elasticsearch[:esmajor]       = "0"
 
 # === NAMING
 #

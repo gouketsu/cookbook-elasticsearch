@@ -35,9 +35,13 @@ module Extensions
     ruby_block "Install plugin: #{name}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
-        url     = params['url']     ? " -url #{params['url']}" : nil
-
-        command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
+        if (node[:elasticsearch][:esmajor] < 2)
+          url     = params['url']     ? " -url #{params['url']}" : nil
+          command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
+        else
+          url     = params['url']     ? " #{params['url']}" : nil
+          command = "#{node.elasticsearch[:bindir]}/plugin install #{name}#{url}"
+       end
         Chef::Log.debug command
 
         raise "[!] Failed to install plugin" unless system command
