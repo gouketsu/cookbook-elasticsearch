@@ -32,7 +32,7 @@ module Extensions
   #
   def install_plugin name, params={}
 
-    ruby_block "Install plugin: #{name}" do
+    ruby_block "Install plugin: #{name} #{params}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
         if (node[:elasticsearch][:esmajor].to_i < 2)
