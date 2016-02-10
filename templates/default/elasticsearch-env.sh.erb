@@ -13,7 +13,6 @@ ES_JAVA_OPTS="
   -server
   -Djava.net.preferIPv4Stack=true
   -Des.config=<%= node.elasticsearch[:path][:conf] %>/elasticsearch.yml
-  --default.path.conf=<%= node.elasticsearch[:path][:conf] %>
   -Xms<%= node.elasticsearch[:allocated_memory] %>
   -Xmx<%= node.elasticsearch[:allocated_memory] %>
   -Xss<%= node.elasticsearch[:thread_stack_size] %>
