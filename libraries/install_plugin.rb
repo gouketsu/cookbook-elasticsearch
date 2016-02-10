@@ -32,7 +32,7 @@ module Extensions
   #
   def install_plugin name, params={}
 
-    ruby_block "Install plugin: #{name} #{params}" do
+    ruby_block "Install plugin: #{name}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
         if (node[:elasticsearch][:esmajor].to_i < 2)
@@ -53,8 +53,7 @@ module Extensions
       notifies :restart, 'service[elasticsearch]' unless node.elasticsearch[:skip_restart]
 
       not_if do
-        Df
-        ir.entries("#{node.elasticsearch[:dir]}/elasticsearch/plugins/").any? do |plugin|
+        Dir.entries("#{node.elasticsearch[:dir]}/elasticsearch/plugins/").any? do |plugin|
           next if plugin =~ /^\./
           name.include? plugin
         end rescue false
