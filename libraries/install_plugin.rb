@@ -35,7 +35,7 @@ module Extensions
     ruby_block "Install plugin: #{name}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
-        if (node[:elasticsearch][:esmajor] < 2)
+        if (node[:elasticsearch][:esmajor].to_i < 2)
           url     = params['url']     ? " -url #{params['url']}" : nil
           command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
         else
