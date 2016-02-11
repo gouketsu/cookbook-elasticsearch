@@ -34,7 +34,7 @@ ulimit -l <%= node[:elasticsearch][:limits][:memlock] %>
 
 PIDFILE='<%= node.elasticsearch[:pid_file] %>'
 ES_INCLUDE='<%= node.elasticsearch[:path][:conf] %>/elasticsearch-env.sh'
-CHECK_PID_RUNNING=$(ps ax | grep 'java' | grep -e "es.pidfile=$PIDFILE" | sed 's/^\s*\([0-9]*\)\s.*/\1/')
+CHECK_PID_RUNNING=$(ps ax | grep 'java' | grep -e "$PIDFILE" | sed 's/^\s*\([0-9]*\)\s.*/\1/')
 RUBY_BIN=""
 
 if command -v ruby >/dev/null 2>&1; then
@@ -115,7 +115,7 @@ stop() {
 restart() {
     stop
     timeout=30
-    while ps aux | grep 'java' | grep -e "es.pidfile"; do
+    while ps aux | grep 'java' | grep -e "$PIDFILE"; do
       echo -n '.'
       (( timeout-- ))
       if [ $timeout -lt '1' ]; then return 1; fi
@@ -130,7 +130,7 @@ status() {
 
   # RUNNING
   if [[ $pid && -d "/proc/$pid" ]]; then
-    if [ -z "$RUBY_BIN" ]; then
+    if [ -n "$RUBY_BIN" ]; then
       version=$(curl -s 'http://localhost:<%= node.elasticsearch[:http][:port] %>' | $RUBY_BIN -e 'require "json"; print JSON.parse(STDIN.read)["version"]["number"]')
       echo -e "\033[1;37;46melasticsearch $version running with PID $pid\033[0m"
     else
