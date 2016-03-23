@@ -32,7 +32,7 @@ module Extensions
   #
   def install_plugin name, params={}
 
-    ruby_block "Install plugin: #{name}" do
+    ruby_block "Install plugin: #{name} #{params}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
         if (node[:elasticsearch][:esmajor].to_i < 2)
@@ -40,7 +40,7 @@ module Extensions
           command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
         else
           url     = params['url']     ? " #{params['url']}" : nil
-          command = "#{node.elasticsearch[:bindir]}/plugin install #{url}"
+          command = "#{node.elasticsearch[:bindir]}/plugin install --batch #{url}"
        end
         Chef::Log.debug command
 
