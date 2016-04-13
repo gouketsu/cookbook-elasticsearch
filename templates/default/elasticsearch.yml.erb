@@ -78,8 +78,9 @@
 <%= print_value 'http.enabled' -%>
 
 ################################### Gateway ###################################
-
+<% if node[:elasticsearch][:esmajor].to_i < 2 %>
 <%= print_value 'gateway.type', node.elasticsearch[:gateway][:type] -%>
+<% end %>
 <%= print_value 'gateway.recover_after_nodes' -%>
 <%= print_value 'gateway.recover_after_time' -%>
 <%= print_value 'gateway.expected_nodes' -%>
