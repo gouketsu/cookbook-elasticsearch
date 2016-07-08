@@ -40,7 +40,13 @@ module Extensions
           command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
         else
           url     = params['url']     ? " #{params['url']}" : nil
-          command = "#{node.elasticsearch[:bindir]}/plugin install --batch #{url}"
+	  if node[:elasticsearch][:esmajor].to_i == 2 &&
+	     node[:elasticsearch][:esminor].to_i < 2)
+	    batch = ''
+	  else
+	    batch = '--batch'
+	  end
+	  command = "#{node.elasticsearch[:bindir]}/plugin install #{batch} #{url}"
        end
         Chef::Log.debug command
 
