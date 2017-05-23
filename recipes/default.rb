@@ -6,7 +6,7 @@ elasticsearch = "elasticsearch-#{node.elasticsearch[:version]}"
 
 Chef::Log.debug "Installation mode #{node[:elasticsearch][:installation][:mode]}"
 
-if node.elasticsearch[:esmajor] >= 5
+if node.elasticsearch[:esmajor].to_i >= 5
   default.elasticsearch[:bootstrap][:memory_lock] = node.elasticsearch[:bootstrap][:mlockall]
   if node.elasticsearch[:limits][:nofile] < 65536
     default.elasticsearch[:limits][:nofile] = 65536

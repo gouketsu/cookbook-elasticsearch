@@ -32,7 +32,7 @@
 <%= print_value 'index.number_of_replicas' -%>
 <%= print_value 'index.auto_expand_replicas' -%>
 <%= print_value 'action.auto_create_index' -%>
-<% if node.elasticsearch[:esmajor] < 1 %>
+<% if node.elasticsearch[:esmajor].to_i  < 1 %>
 <%= print_value 'action.disable_delete_all_indices' -%>
 <% else %>
 <%= print_value 'action.destructive_requires_name' -%>
@@ -54,7 +54,7 @@
 ################################### Memory ####################################
 
 
-<% if node.elasticsearch[:esmajor] < 5 %>
+<% if node.elasticsearch[:esmajor].to_i  < 5 %>
 <%= print_value 'bootstrap.mlockall' -%>
 <% else %>
 <%= print_value 'bootstrap.memory_lock' -%>
@@ -135,7 +135,7 @@ discovery.ec2.tag.<%= key %>: <%= value %>
 ################################## Slow Log ###################################
 
 
-<% if node.elasticsearch[:esmajor] < 5 %>
+<% if node.elasticsearch[:esmajor].to_i  < 5 %>
 <%= print_value 'index.mapper.dynamic' -%>
 <%= print_value 'index.search.slowlog.threshold.query.warn' -%>
 <%= print_value 'index.search.slowlog.threshold.query.info' -%>
