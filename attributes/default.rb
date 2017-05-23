@@ -82,6 +82,7 @@ default.elasticsearch[:limits][:nofile]  = '64000'
 default.elasticsearch[:index][:mapper][:dynamic]   = true
 default.elasticsearch[:action][:auto_create_index] = true
 default.elasticsearch[:action][:disable_delete_all_indices] = true
+default.elasticsearch[:action][:destructive_requires_name] = true
 default.elasticsearch[:node][:max_local_storage_nodes] = 1
 
 default.elasticsearch[:discovery][:zen][:ping][:multicast][:enabled] = true

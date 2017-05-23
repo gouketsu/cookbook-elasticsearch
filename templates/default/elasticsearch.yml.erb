@@ -31,9 +31,12 @@
 <%= print_value 'index.number_of_shards' -%>
 <%= print_value 'index.number_of_replicas' -%>
 <%= print_value 'index.auto_expand_replicas' -%>
-<%= print_value 'index.mapper.dynamic' -%>
 <%= print_value 'action.auto_create_index' -%>
+<% if node.elasticsearch[:esmajor] < 1 %>
 <%= print_value 'action.disable_delete_all_indices' -%>
+<% else %>
+<%= print_value 'action.destructive_requires_name' -%>
+<% end %>
 
 #################################### Paths ####################################
 
@@ -50,7 +53,12 @@
 
 ################################### Memory ####################################
 
+
+<% if node.elasticsearch[:esmajor] < 5 %>
 <%= print_value 'bootstrap.mlockall' -%>
+<% else %>
+<%= print_value 'bootstrap.memory_lock' -%>
+<% end %>
 
 ############################## Network And HTTP ###############################
 
@@ -98,7 +106,9 @@
 
 <%= print_value 'discovery.zen.minimum_master_nodes' -%>
 <%= print_value 'discovery.zen.ping.timeout' -%>
+<% if node[:elasticsearch][:esmajor].to_i < 2 %>
 <%= print_value 'discovery.zen.ping.multicast.enabled' -%>
+<% end %>
 <%= print_value 'discovery.zen.ping.unicast.hosts' -%>
 
 <%- if node.elasticsearch[:cloud] -%>
@@ -124,6 +134,9 @@ discovery.ec2.tag.<%= key %>: <%= value %>
 
 ################################## Slow Log ###################################
 
+
+<% if node.elasticsearch[:esmajor] < 5 %>
+<%= print_value 'index.mapper.dynamic' -%>
 <%= print_value 'index.search.slowlog.threshold.query.warn' -%>
 <%= print_value 'index.search.slowlog.threshold.query.info' -%>
 <%= print_value 'index.search.slowlog.threshold.query.debug' -%>
@@ -138,6 +151,7 @@ discovery.ec2.tag.<%= key %>: <%= value %>
 <%= print_value 'index.indexing.slowlog.threshold.index.info' -%>
 <%= print_value 'index.indexing.slowlog.threshold.index.debug' -%>
 <%= print_value 'index.indexing.slowlog.threshold.index.trace' -%>
+<% end %>
 
 ################################## GC Logging #################################
 

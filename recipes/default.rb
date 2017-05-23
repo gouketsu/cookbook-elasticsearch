@@ -6,6 +6,13 @@ elasticsearch = "elasticsearch-#{node.elasticsearch[:version]}"
 
 Chef::Log.debug "Installation mode #{node[:elasticsearch][:installation][:mode]}"
 
+if node.elasticsearch[:esmajor] >= 5
+  default.elasticsearch[:bootstrap][:memory_lock] = node.elasticsearch[:bootstrap][:mlockall]
+  if node.elasticsearch[:limits][:nofile] < 65536
+    default.elasticsearch[:limits][:nofile] = 65536
+  end
+end
+
 if node[:elasticsearch][:installation][:mode] == 'pkg'
   case node['platform']
     when "ubuntu","debian"
