@@ -35,39 +35,36 @@ module Extensions
     ruby_block "Install plugin: #{name} #{params}" do
       block do
         version = params['version'] ? "/#{params['version']}" : nil
-        if (node[:elasticsearch][:esmajor].to_i < 2)
+        if (node['elasticsearch']['esmajor'].to_i < 2)
           url     = params['url']     ? " -url #{params['url']}" : nil
-          command = "#{node.elasticsearch[:bindir]}/plugin -install #{name}#{version}#{url}"
+          command = "#{node['elasticsearch']['bindir']}/plugin -install #{name}#{version}#{url}"
         else
           url     = params['url']     ? " #{params['url']}" : nil
-          if node[:elasticsearch][:esmajor].to_i == 2 &&
-             node[:elasticsearch][:esminor].to_i < 2
+          if node['elasticsearch']['esmajor'].to_i == 2 &&
+             node['elasticsearch']['esminor'].to_i < 2
 
             batch = ''
           else
             batch = '--batch'
           end
-          command = "#{node.elasticsearch[:bindir]}/plugin install #{batch} #{url}"
+          command = "#{node['elasticsearch']['bindir']}/plugin install #{batch} #{url}"
        end
         Chef::Log.debug command
 
         raise "[!] Failed to install plugin" unless system command
 
         # Ensure proper permissions
-        raise "[!] Failed to set permission" unless system "chown -R #{node.elasticsearch[:user]}:#{node.elasticsearch[:user]} #{node.elasticsearch[:dir]}/elasticsearch/plugins/"
+        raise "[!] Failed to set permission" unless system "chown -R #{node['elasticsearch']['user']}:#{node['elasticsearch']['user']} #{node['elasticsearch']['dir']}/elasticsearch/plugins/"
       end
 
-      notifies :restart, 'service[elasticsearch]' unless node.elasticsearch[:skip_restart]
+      notifies :restart, 'service[elasticsearch]' unless node['elasticsearch']['skip_restart']
 
       not_if do
-        Dir.entries("#{node.elasticsearch[:dir]}/elasticsearch/plugins/").any? do |plugin|
+        Dir.entries("#{node['elasticsearch']['dir']}/elasticsearch/plugins/").any? do |plugin|
           next if plugin =~ /^\./
           name.include? plugin
         end rescue false
       end
-
     end
-
   end
-
 end

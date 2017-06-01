@@ -32,7 +32,7 @@
 <%= print_value 'index.number_of_replicas' -%>
 <%= print_value 'index.auto_expand_replicas' -%>
 <%= print_value 'action.auto_create_index' -%>
-<% if node.elasticsearch[:esmajor].to_i  < 1 %>
+<% if node['elasticsearch']['esmajor'].to_i  < 1 %>
 <%= print_value 'action.disable_delete_all_indices' -%>
 <% else %>
 <%= print_value 'action.destructive_requires_name' -%>
@@ -41,20 +41,20 @@
 #################################### Paths ####################################
 
 <%= print_value 'path.conf' -%>
-<%= print_value 'path.data', (node.elasticsearch.path.data.is_a?(Array) ? node.elasticsearch.path.data.join(",") : node.elasticsearch.path.data) -%>
+<%= print_value 'path.data', (node['elasticsearch']['path']['data'].is_a?(Array) ? node['elasticsearch']['path']['data'].join(",") : node['elasticsearch']['path.data']) -%>
 <%= print_value 'path.work' -%>
 <%= print_value 'path.logs' -%>
 <%= print_value 'path.plugins' -%>
 
 #################################### Plugin ###################################
 
-<%= print_value 'plugin.mandatory', node[:elasticsearch][:plugin][:mandatory].join(',') \
-    unless node[:elasticsearch][:plugin][:mandatory].empty? -%>
+<%= print_value 'plugin.mandatory', node['elasticsearch']['plugin']['mandatory'].join(',') \
+    unless node['elasticsearch']['plugin']['mandatory'].empty? -%>
 
 ################################### Memory ####################################
 
 
-<% if node.elasticsearch[:esmajor].to_i  < 5 %>
+<% if node['elasticsearch']['esmajor'].to_i  < 5 %>
 <%= print_value 'bootstrap.mlockall' -%>
 <% else %>
 <%= print_value 'bootstrap.memory_lock' -%>
@@ -86,8 +86,8 @@
 <%= print_value 'http.enabled' -%>
 
 ################################### Gateway ###################################
-<% if node[:elasticsearch][:esmajor].to_i < 2 %>
-<%= print_value 'gateway.type', node.elasticsearch[:gateway][:type] -%>
+<% if node['elasticsearch']['esmajor'].to_i < 2 %>
+<%= print_value 'gateway.type', node['elasticsearch']['gateway]'['type'] -%>
 <% end %>
 <%= print_value 'gateway.recover_after_nodes' -%>
 <%= print_value 'gateway.recover_after_time' -%>
@@ -102,16 +102,16 @@
 
 ################################## Discovery ##################################
 
-<%= print_value 'discovery.type', node.elasticsearch[:discovery][:type] -%>
+<%= print_value 'discovery.type', node['elasticsearch']['discovery']['type'] -%>
 
 <%= print_value 'discovery.zen.minimum_master_nodes' -%>
 <%= print_value 'discovery.zen.ping.timeout' -%>
-<% if node[:elasticsearch][:esmajor].to_i < 2 %>
+<% if node['elasticsearch']['esmajor'].to_i < 2 %>
 <%= print_value 'discovery.zen.ping.multicast.enabled' -%>
 <% end %>
 <%= print_value 'discovery.zen.ping.unicast.hosts' -%>
 
-<%- if node.elasticsearch[:cloud] -%>
+<%- if node['elasticsearch']['cloud'] -%>
 <%= print_value 'cloud.node.auto_attributes' -%>
 <%= print_value 'cloud.aws.access_key' -%>
 <%= print_value 'cloud.aws.secret_key' -%>
@@ -122,9 +122,9 @@
 <%= print_value 'discovery.ec2.availability_zones' -%>
 <%= print_value 'discovery.ec2.any_group' -%>
 <%= print_value 'discovery.ec2.ping_timeout' -%>
-<%- node.elasticsearch[:discovery][:ec2][:tag].sort.each do |key, value| -%>
+<%- node['elasticsearch']['discovery']['ec2']['tag'].sort.each do |key, value| -%>
 discovery.ec2.tag.<%= key %>: <%= value %>
-<%- end unless node.elasticsearch[:discovery][:ec2][:tag].keys.empty? rescue false -%>
+<%- end unless node['elasticsearch']['discovery']['ec2']['tag'].keys.empty? rescue false -%>
 
 <%= print_value 'cloud.gce.project_id' -%>
 <%= print_value 'cloud.gce.zone' -%>
@@ -135,7 +135,7 @@ discovery.ec2.tag.<%= key %>: <%= value %>
 ################################## Slow Log ###################################
 
 
-<% if node.elasticsearch[:esmajor].to_i  < 5 %>
+<% if node['elasticsearch']['esmajor'].to_i  < 5 %>
 <%= print_value 'index.mapper.dynamic' -%>
 <%= print_value 'index.search.slowlog.threshold.query.warn' -%>
 <%= print_value 'index.search.slowlog.threshold.query.info' -%>
@@ -165,7 +165,7 @@ discovery.ec2.tag.<%= key %>: <%= value %>
 
 ################################## JMX ########################################
 
-<%- if node.elasticsearch[:jmx] -%>
+<%- if node['elasticsearch']['jmx'] -%>
 jmx.create_connector: true
 jmx.port: 9400-9500
 jmx.domain: elasticsearch
@@ -173,6 +173,6 @@ jmx.domain: elasticsearch
 
 ################################## Custom #####################################
 
-<% node.elasticsearch[:custom_config].sort.each do |key, value| %>
+<% node['elasticsearch']['custom_config'].sort.each do |key, value| %>
 <%= key %>: <%= value %>
 <% end %>
