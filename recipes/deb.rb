@@ -15,7 +15,7 @@ end
 
 ruby_block 'Set heap size in /etc/default/elasticsearch' do
   block do
-    fe = Chef::Util::FileEdit.new("'etc/default/elasticsearch')
+    fe = Chef::Util::FileEdit.new('etc/default/elasticsearch')
     fe.insert_line_if_no_match(/ES_HEAP_SIZE=/, "ES_HEAP_SIZE=#{node['elasticsearch']['allocated_memory']}")
     fe.search_file_replace_line(/ES_HEAP_SIZE=/, "ES_HEAP_SIZE=#{node['elasticsearch']['allocated_memory']}") # if the value has changed but the line exists in the file
     fe.write_file

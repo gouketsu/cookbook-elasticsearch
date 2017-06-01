@@ -179,7 +179,7 @@ end
 # Create ES config file
 #
 template "elasticsearch.yml" do
-  path   "#{node['elasticsearch']['path']['conf]'}/elasticsearch.yml"
+  path   "#{node['elasticsearch']['path']['conf']}/elasticsearch.yml"
   source node['elasticsearch']['templates']['elasticsearch_yml']
   owner  node['elasticsearch']['user'] and group node['elasticsearch']['user'] and mode 0755
 
