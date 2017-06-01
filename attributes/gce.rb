@@ -3,7 +3,7 @@ include_attribute 'elasticsearch::plugins'
 
 # Load configuration and credentials from data bag 'elasticsearch/gce' -
 #
-gce = Chef::DataBagItem.load('elasticsearch', 'gce')[node['chef_environment']] rescue {}
+gce = Chef::DataBagItem.load('elasticsearch', 'gce')[node.chef_environment] rescue {}
 # ----------------------------------------------------------------------
 
 # To use the GCE discovery, you have to properly set up the configuration,

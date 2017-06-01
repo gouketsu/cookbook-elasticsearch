@@ -139,7 +139,7 @@ status() {
     # VERBOSE
     if [[ $pid && $1 == '-v' || $1 == '--verbose' ]]; then
       if [ -z "$RUBY_BIN" ]; then
-        curl -s 'http://localhost:<%= node['elasticsearch']['http']['port'] %>/_cluster/nodes/<%= node.elasticsearch['node']['name'] %>?os&process&jvm&network&transport&settings&pretty' | \
+        curl -s 'http://localhost:<%= node['elasticsearch']['http']['port'] %>/_cluster/nodes/<%= node['elasticsearch']['node']['name'] %>?os&process&jvm&network&transport&settings&pretty' | \
         $RUBY_BIN -e '
           begin
             require "json"; h = JSON.parse(STDIN.read); id, node = h["nodes"].first;

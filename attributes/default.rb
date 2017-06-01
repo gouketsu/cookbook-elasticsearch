@@ -28,7 +28,7 @@ default['elasticsearch']['esminor']       = '90'
 # === NAMING
 #
 default['elasticsearch']['cluster']['name'] = 'elasticsearch'
-default['elasticsearch']['node']['name']    = node['name']
+default['elasticsearch']['node']['name']    = node.name
 
 # === USER & PATHS
 #
