@@ -2,6 +2,7 @@
 #
 # elasticsearch
 #
+
 <% if node.platform_family?('debian') %>
 ### BEGIN INIT INFO
 # Provides:          elasticsearch
@@ -18,6 +19,12 @@
 # processname: elasticsearch
 # config:      <%= node['elasticsearch']['path']['conf'] %>/elasticsearch.yml
 <% end %>
+
+<% if node['lsb']['codename'] == 'xenial' %>
+		# We are on xenial init.d is not supported any more
+		printf "Not supported any more. Use service elasticsearch start instead\n"
+		exit 1
+<%end%>
 
 # Source networking configuration
 #

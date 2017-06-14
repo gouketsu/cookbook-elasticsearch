@@ -86,28 +86,57 @@ end
 # Create service
 #
 
+
+execute 'systemctl daemon-reload' do
+  command 'systemctl daemon-reload'
+  action :nothing
+end
+
+execute 'set pid file' do
+  command "touch #{node['elasticsearch']['pid_file']} && chown #{node['elasticsearch']['user']} #{node['elasticsearch']['pid_file']}"
+  not_if {::File.exist?(node['elasticsearch']['pid_file'])}
+  action :run
+end
+
 if node['elasticsearch']['installation']['mode'] != 'tar'
   case node['platform']
     when 'ubuntu','debian'
       template '/etc/init.d/elasticsearch' do
-	source 'elasticsearch.init.erb'
-	owner 'root' and mode 0755
+        source 'elasticsearch.init.erb'
+        owner 'root' and mode 0755
       end
   end
-  service 'elasticsearch' do
-    supports :status => true, :restart => true
-    action [ :enable ]
-  end
+
 else
   template '/etc/init.d/elasticsearch' do
     source 'elasticsearch.init.erb'
     owner 'root' and mode 0755
   end
+end
+if node['lsb']['codename'] == 'xenial'
+  template '/usr/lib/systemd/system/elasticsearch.service' do
+    source 'elasticsearch.service.erb'
+    owner 'root'
+    group 'root'
+    mode '0644'
+    action :create
+    notifies :run, 'execute[systemctl daemon-reload]', :immediately
+  end
+  service 'elasticsearch' do
+    provider Chef::Provider::Service::Systemd
+    retries 5
+    retry_delay 10
+    supports :status => true, :restart => true
+    action [ :enable ]
+  end
+else
   service 'elasticsearch' do
     supports :status => true, :restart => true
     action [ :enable ]
   end
+end
 
+if node['elasticsearch']['installation']['mode'] == 'tar'
   # Download, extract, symlink the elasticsearch libraries and binaries
   #
   ark_prefix_root = node['elasticsearch']['dir'] || node['ark']['prefix_root']

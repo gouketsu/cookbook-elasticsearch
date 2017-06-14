@@ -1,0 +1,50 @@
+[Unit]
+Description=Elasticsearch
+Documentation=http://www.elastic.co
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Environment=ES_HOME='<%= "#{node['elasticsearch']['dir']}/elasticsearch" %>'
+Environment=ES_HEAP_SIZE=<%= node['elasticsearch']['allocated_memory'] %>
+<% if node['elasticsearch']['esmajor'].to_i < 2 %>
+Environment=ES_CLASSPATH=$ES_CLASSPATH:$ES_HOME/lib/*:$ES_HOME/lib/sigar/*
+<% else %>
+Environment=ES_CLASSPATH=$ES_HOME/lib/
+<% end %>
+Environment=CONF_DIR=<%= node['elasticsearch']['path']['conf'] %>
+Environment=ES_STARTUP_SLEEP_TIME=5
+Environment=ES_INCLUDE=/etc/elasticsearch/elasticsearch-env.sh
+
+
+WorkingDirectory=/usr/share/elasticsearch
+
+User=<%= node['elasticsearch']['user'] %>
+
+
+Type=simple
+Restart=on-failure
+ExecStartPre=/usr/share/elasticsearch/bin/elasticsearch-systemd-pre-exec
+ExecStart=/usr/share/elasticsearch/bin/elasticsearch -p '<%= node['elasticsearch']['pid_file'] %>'
+
+
+StandardOutput=journal
+StandardError=inherit
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=<%= node['elasticsearch']['limits']['nofile']  %>
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=0
+
+# SIGTERM signal is used to stop the Java process
+KillSignal=SIGTERM
+
+# Java process is never killed
+SendSIGKILL=no
+
+# When a JVM receives a SIGTERM signal it exits with code 143
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
