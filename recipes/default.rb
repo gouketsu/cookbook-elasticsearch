@@ -8,8 +8,8 @@ Chef::Log.debug "Installation mode #{node['elasticsearch']['installation']['mode
 
 if node['elasticsearch']['esmajor'].to_i >= 5
   node.default['elasticsearch']['bootstrap']['memory_lock'] = node['elasticsearch']['bootstrap']['mlockall']
-  if node['elasticsearch']['limits']['nofile'] < 65536
-    node.default['elasticsearch']['limits']['nofile'] = 65536
+  if node['elasticsearch']['limits']['nofile'].to_i < 65536
+    node.default['elasticsearch']['limits']['nofile'] = '65536'
   end
 end
 
@@ -217,10 +217,20 @@ end
 
 # Create ES logging file
 #
-template "logging.yml" do
-  path   "#{node['elasticsearch']['path']['conf']}/logging.yml"
-  source node['elasticsearch']['templates']['logging_yml']
-  owner  node['elasticsearch']['user'] and group node['elasticsearch']['user'] and mode 0755
+if node['elasticsearch']['esmajor'].to_i >= 5
+  template "log4j2.properties" do
+    path   "#{node['elasticsearch']['path']['conf']}/log4j2.properties"
+    source node['elasticsearch']['templates']['log4j_properties']
+    owner  node['elasticsearch']['user'] and group node['elasticsearch']['user'] and mode 0755
 
-  notifies :restart, 'service[elasticsearch]' unless node['elasticsearch']['skip_restart']
+    notifies :restart, 'service[elasticsearch]' unless node['elasticsearch']['skip_restart']
+  end
+else
+  template "logging.yml" do
+    path   "#{node['elasticsearch']['path']['conf']}/logging.yml"
+    source node['elasticsearch']['templates']['logging_yml']
+    owner  node['elasticsearch']['user'] and group node['elasticsearch']['user'] and mode 0755
+
+    notifies :restart, 'service[elasticsearch]' unless node['elasticsearch']['skip_restart']
+  end
 end

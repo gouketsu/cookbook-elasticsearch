@@ -6,7 +6,9 @@ After=network-online.target
 
 [Service]
 Environment=ES_HOME='<%= "#{node['elasticsearch']['dir']}/elasticsearch" %>'
+<% if node['elasticsearch']['esmajor'].to_i < 5 %>
 Environment=ES_HEAP_SIZE=<%= node['elasticsearch']['allocated_memory'] %>
+<% end %>
 <% if node['elasticsearch']['esmajor'].to_i < 2 %>
 Environment=ES_CLASSPATH=$ES_CLASSPATH:$ES_HOME/lib/*:$ES_HOME/lib/sigar/*
 <% else %>

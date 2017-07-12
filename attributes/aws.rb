@@ -39,4 +39,4 @@ default['elasticsearch']['cloud']['aws']['secret_key'] = (aws['cloud']['aws']['s
 default['elasticsearch']['cloud']['aws']['region'] = (aws['cloud']['aws']['region'] rescue nil)
 default['elasticsearch']['cloud']['aws']['ec2']['endpoint'] = (aws['cloud']['aws']['ec2']['endpoint'] rescue nil)
 
-default['elasticsearch']['cloud']['node']['auto_attributes'] = true
+

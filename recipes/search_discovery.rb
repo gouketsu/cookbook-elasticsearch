@@ -23,6 +23,11 @@ nodes = search_for_nodes(node['elasticsearch']['discovery']['search_query'],
 Chef::Log.debug("Found elasticsearch nodes at #{nodes.join(', ').inspect}")
 node.normal['elasticsearch']['discovery']['zen']['ping']['unicast']['hosts'] = nodes.join(',')
 
+if node['elasticsearch']['discovery']['zen']['ping']['unicast']['hosts'].empty?
+  node.normal['elasticsearch']['discovery']['zen']['ping']['unicast']['hosts'] =
+    select_attribute(node, node['elasticsearch']['discovery']['node_attribute'])
+end
+
 # set minimum_master_nodes to n/2+1 to avoid split brain scenarios
 node.default['elasticsearch']['discovery']['zen']['minimum_master_nodes'] = (nodes.length / 2).floor + 1
 

@@ -48,6 +48,8 @@ default['elasticsearch']['pid_file']  = "#{node['elasticsearch']['pid_path']}/#{
 default['elasticsearch']['templates']['elasticsearch_env'] = 'elasticsearch-env.sh.erb'
 default['elasticsearch']['templates']['elasticsearch_yml'] = 'elasticsearch.yml.erb'
 default['elasticsearch']['templates']['logging_yml']       = 'logging.yml.erb'
+default['elasticsearch']['templates']['log4j2.properties'] = 'log4j2.properties.erb'
+
 
 # === MEMORY
 #

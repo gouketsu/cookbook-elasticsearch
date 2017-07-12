@@ -31,5 +31,3 @@ default['elasticsearch']['discovery']['gce']['tags']       = ( gce['discovery'][
 
 default['elasticsearch']['cloud']['gce']['project_id']     = ( gce['cloud']['gce']['project_id']     rescue nil )
 default['elasticsearch']['cloud']['gce']['zone']		     = ( gce['cloud']['gce']['zone']     	   rescue nil )
-
-default['elasticsearch']['cloud']['node']['auto_attributes'] = true
