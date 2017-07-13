@@ -1,6 +1,7 @@
 # See <http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/_linux.html>
 
 filename = node['elasticsearch']['deb_url'].split('/').last
+version = File.basename(filename, File.extname(filename)).split('-').last
 
 remote_file "#{Chef::Config['file_cache_path']}/#{filename}" do
   source   node['elasticsearch']['deb_url']
@@ -10,6 +11,7 @@ end
 
 dpkg_package "#{Chef::Config['file_cache_path']}/#{filename}" do
   action :install
+  version version
   options "--force-confdef"
 end
 
